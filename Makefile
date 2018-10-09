@@ -16,22 +16,16 @@ SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 .PHONY: all build clean install uninstall fmt simplify check run
 
-all: check install
+all: check build
 
 $(TARGET): $(SRC)
-	@go build $(LDFLAGS) -o $(TARGET)
+	@go build  $(LDFLAGS) -o $(TARGET)
 
 build: $(TARGET)
 	@true
 
 clean:
 	@rm -f $(TARGET)
-
-install:
-	@go install $(LDFLAGS)
-
-uninstall: clean
-	@rm -f $$(which ${TARGET})
 
 fmt:
 	@gofmt -l -w $(SRC)
@@ -44,5 +38,5 @@ check:
 	@for d in $$(go list ./... | grep -v /vendor/); do golint $${d}; done
 	@go tool vet ${SRC}
 
-run: install
-	@$(TARGET)
+run: build
+	@ ./$(TARGET)
