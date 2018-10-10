@@ -1,6 +1,6 @@
 // Copyright © 2018 NAME HERE coinpaprika.com
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	Version = "unknown"
-	Build   = "unknown"
+	version = "unknown"
+	build   = "unknown"
 )
 
 // versionCmd represents the version command
@@ -31,7 +31,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Shows the application version and git revision",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("\nBuilt : %s \nVersion: %s (with : %s)\n\n", Build, Version, runtime.Version())
+		fmt.Printf("\nBuilt : %s \nVersion: %s (with : %s)\n\n", build, version, runtime.Version())
 	},
 }
 

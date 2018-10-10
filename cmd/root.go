@@ -1,6 +1,6 @@
 // Copyright © 2018 coinpaprika.com
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -31,9 +31,9 @@ var rootCmd = &cobra.Command{
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(version, build string) {
-	Version = version
-	Build = build
+func Execute(versionParent, buildParent string) {
+	version = versionParent
+	build = buildParent
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

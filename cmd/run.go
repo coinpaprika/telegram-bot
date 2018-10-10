@@ -1,6 +1,6 @@
 // Copyright © 2018 coinpaprika.com
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -30,7 +30,7 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string)  {
+	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("run called")
 	},
 }
