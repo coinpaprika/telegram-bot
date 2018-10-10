@@ -5,17 +5,6 @@ import (
 	"gopkg.in/telegram-bot-api.v4"
 )
 
-type BotConfig struct {
-	Token          string
-	Debug          bool
-	UpdatesTimeout int
-}
-
-type Bot struct {
-	Bot    *tgbotapi.BotAPI
-	Config BotConfig
-}
-
 func NewBot(c BotConfig) (*Bot, error) {
 	bot, err := tgbotapi.NewBotAPI(c.Token)
 	if err != nil {
@@ -35,4 +24,11 @@ func (b *Bot) GetUpdatesChannel() (tgbotapi.UpdatesChannel, error) {
 		updatesConfig.Timeout = b.Config.UpdatesTimeout
 	}
 	return b.Bot.GetUpdatesChan(updatesConfig)
+}
+
+func (b *Bot) SendMessage(m Message) error {
+	msg := tgbotapi.NewMessage(int64(m.ChatID), m.Text)
+	msg.ReplyToMessageID = m.MessageID
+	_, err := b.Bot.Send(msg)
+	return errors.Wrapf(err, "could not send message: %v", m)
 }
