@@ -15,36 +15,89 @@
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/coinpaprika/telegram-bot/telegram"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"gopkg.in/telegram-bot-api.v4"
 )
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("run called")
+	Short: "Run coinpaprika bot",
+	Long:  ``,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return run()
 	},
 }
+var debug bool
+var token string
 
 func init() {
 	rootCmd.AddCommand(runCmd)
+	runCmd.Flags().BoolVarP(&debug, "debug", "d", false, "enable debugging messages")
+	runCmd.Flags().StringVarP(&token, "token", "t", "", "telegram API token")
+	runCmd.MarkFlagRequired("token")
+}
 
-	// Here you will define your flags and configuration settings.
+func run() error {
+	log.SetLevel(log.ErrorLevel)
+	if debug {
+		log.SetLevel(log.DebugLevel)
+	}
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// runCmd.PersistentFlags().String("foo", "", "A help for foo")
+	log.Debug("starting telegram-bot")
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	bot, err := telegram.NewBot(telegram.BotConfig{
+		Token:          token,
+		Debug:          debug,
+		UpdatesTimeout: 60,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	updates, err := bot.GetUpdatesChannel()
+	if err != nil {
+		return err
+	}
+	go func(updates tgbotapi.UpdatesChannel) {
+		for u := range updates {
+			log.Debugf("Got message: %v", u)
+
+			if u.Message == nil {
+				log.Debug("Received non-message or non-command")
+				continue
+			}
+
+			text := `Please use one of the commands:
+			/start or /help show this message
+			/website show link to the coinpaprika webpage
+			/p <symbol> check the price for given coin
+			`
+			log.Debugf("received command: %s", u.Message.Command())
+			switch u.Message.Command() {
+			case "website":
+				text = "https://coinpaprika.com"
+			case "p":
+				text = "6200.3"
+			}
+
+			err := bot.SendMessage(telegram.Message{
+				ChatID:    int(u.Message.Chat.ID),
+				Text:      text,
+				MessageID: u.Message.MessageID,
+			})
+
+			if err != nil {
+				log.Error(err)
+			}
+		}
+
+	}(updates)
+
+	select {}
+
+	//return nil
 }
