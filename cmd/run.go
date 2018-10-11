@@ -15,7 +15,13 @@
 package cmd
 
 import (
+	"fmt"
+	"net/http"
+
+	"github.com/coinpaprika/coinpaprika-api-go-client"
 	"github.com/coinpaprika/telegram-bot/telegram"
+	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gopkg.in/telegram-bot-api.v4"
@@ -32,11 +38,13 @@ var runCmd = &cobra.Command{
 }
 var debug bool
 var token string
+var metrics int
 
 func init() {
 	rootCmd.AddCommand(runCmd)
 	runCmd.Flags().BoolVarP(&debug, "debug", "d", false, "enable debugging messages")
 	runCmd.Flags().StringVarP(&token, "token", "t", "", "telegram API token")
+	runCmd.Flags().IntVarP(&metrics, "metrics", "m", 9900, "metrics port (default :9900) endpoint: /metrics")
 	runCmd.MarkFlagRequired("token")
 }
 
@@ -72,16 +80,23 @@ func run() error {
 			}
 
 			text := `Please use one of the commands:
-			/start or /help show this message
-			/website show link to the coinpaprika webpage
-			/p <symbol> check the price for given coin
+
+			/start or /help 	show this message
+			/p <symbol> 		check the price for given coin
+
+			/website	 		show link to the coinpaprika webpage
+			/source 			show source code of this bot
 			`
 			log.Debugf("received command: %s", u.Message.Command())
 			switch u.Message.Command() {
 			case "website":
 				text = "https://coinpaprika.com"
+			case "source":
+				text = "https://github.com/coinpaprika/telegram-bot"
 			case "p":
-				text = "6200.3"
+				if text, err = commandP(u.Message.CommandArguments()); err != nil {
+					text = err.Error()
+				}
 			}
 
 			err := bot.SendMessage(telegram.Message{
@@ -97,7 +112,36 @@ func run() error {
 
 	}(updates)
 
-	select {}
+	log.Debugf("launching metrics endpoints :%d/metrics", metrics)
+	http.Handle("/metrics", promhttp.Handler())
+	return http.ListenAndServe(fmt.Sprintf(":%d", metrics), http.DefaultServeMux)
+}
 
-	//return nil
+func commandP(argument string) (string, error) {
+	log.Debugf("starting command /p with argument :%s", argument)
+
+	paprikaClient, err := coinpaprika.NewClient()
+	if err != nil {
+		return "", errors.Wrap(err, "command /p argument:"+argument)
+	}
+
+	result, err := paprikaClient.Search(argument, &coinpaprika.SearchOptions{Categories: "currencies"})
+	if err != nil {
+		return "", errors.Wrap(err, "command /p argument:"+argument)
+	}
+
+	log.Debugf("found %d results for command /p with argument :%s", len(result.Currencies), argument)
+	if len(result.Currencies) <= 0 {
+		return "", errors.Errorf("%s is invalid coin name|ticker|symbol", argument)
+	}
+
+	tickerID := result.Currencies[0].ID
+	log.Debugf("best match for command /p with argument :%s is: %s", argument, tickerID)
+
+	ticker, err := paprikaClient.GetTickerByID(tickerID)
+	if err != nil {
+		return "", errors.Wrap(err, "command /p argument:"+argument)
+	}
+
+	return fmt.Sprintf("%s price: %f USD, %f BTC", ticker.Name, *ticker.PriceUSD, *ticker.PriceBTC), nil
 }
