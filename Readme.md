@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/coinpaprika/telegram-bot.svg?branch=master)](https://travis-ci.org/coinpaprika/telegram-bot)
+[![go-doc](https://godoc.org/github.com/coinpaprika/telegram-bot?status.svg)](https://godoc.org/github.com/coinpaprika/telegram-bot)
+[![Go Report Card](https://goreportcard.com/badge/github.com/coinpaprika/telegram-bot)](https://goreportcard.com/report/github.com/coinpaprika/telegram-bot)
+
 # Coinpaprika telegram bot
 
 ## Telegram address 
