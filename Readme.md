@@ -4,6 +4,16 @@
 
 # Coinpaprika telegram bot
 
+## Commands
+
+```
+   /start or /help  show this message
+   /p <symbol>      check the coin price
+   /s <symbol>      check the circulating supply
+   /v <symbol>      check the 24h volume
+   /source          show source code of this bot
+```   
+
 ## Telegram address 
 https://t.me/CoinpaprikaBot
 
