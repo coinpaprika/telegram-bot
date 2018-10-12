@@ -3,10 +3,10 @@
 ## Telegram address 
 https://t.me/CoinpaprikaBot
 
-## Binary release
+## Binary releases
 https://github.com/coinpaprika/telegram-bot/releases
 
-## Building project
+## Building project from source
 
 ```
 git clone git@github.com:coinpaprika/telegram-bot.git
