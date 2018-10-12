@@ -21,24 +21,34 @@ import (
 	"github.com/coinpaprika/coinpaprika-api-go-client"
 	"github.com/coinpaprika/telegram-bot/telegram"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gopkg.in/telegram-bot-api.v4"
 )
 
-// runCmd represents the run command
-var runCmd = &cobra.Command{
-	Use:   "run",
-	Short: "Run coinpaprika bot",
-	Long:  ``,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return run()
-	},
-}
-var debug bool
-var token string
-var metrics int
+var (
+	debug   bool
+	token   string
+	metrics int
+
+	runCmd = &cobra.Command{
+		Use:   "run",
+		Short: "Run coinpaprika bot",
+		Long:  ``,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return run()
+		},
+	}
+
+	commandsProcessed = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: "coinpaprika",
+		Subsystem: "telegram_bot",
+		Name:      "commands_proccessed",
+		Help:      "The total number of processed commands",
+	})
+)
 
 func init() {
 	rootCmd.AddCommand(runCmd)
@@ -46,6 +56,9 @@ func init() {
 	runCmd.Flags().StringVarP(&token, "token", "t", "", "telegram API token")
 	runCmd.Flags().IntVarP(&metrics, "metrics", "m", 9900, "metrics port (default :9900) endpoint: /metrics")
 	runCmd.MarkFlagRequired("token")
+
+	prometheus.MustRegister(commandsProcessed)
+
 }
 
 func run() error {
@@ -78,6 +91,7 @@ func run() error {
 				log.Debug("Received non-message or non-command")
 				continue
 			}
+			commandsProcessed.Inc()
 
 			text := `Please use one of the commands:
 
