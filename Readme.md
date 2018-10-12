@@ -3,6 +3,9 @@
 ## Telegram address 
 https://t.me/CoinpaprikaBot
 
+## Binary release
+https://github.com/coinpaprika/telegram-bot/releases
+
 ## Building project
 
 ```
