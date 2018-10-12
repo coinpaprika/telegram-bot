@@ -58,7 +58,6 @@ func init() {
 	runCmd.MarkFlagRequired("token")
 
 	prometheus.MustRegister(commandsProcessed)
-
 }
 
 func run() error {
