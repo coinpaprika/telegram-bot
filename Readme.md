@@ -1,7 +1,7 @@
 # Coinpaprika telegram bot
 
 ## Telegram address 
-t.me/CoinpaprikaBot
+https://t.me/CoinpaprikaBot
 
 ## Building project
 
