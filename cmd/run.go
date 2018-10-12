@@ -86,7 +86,7 @@ func run() error {
 		for u := range updates {
 			log.Debugf("Got message: %v", u)
 
-			if u.Message == nil {
+			if u.Message == nil || !u.Message.IsCommand() {
 				log.Debug("Received non-message or non-command")
 				continue
 			}
