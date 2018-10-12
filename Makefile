@@ -9,7 +9,7 @@ VERSION := 1.0.0
 BUILD := `git rev-parse HEAD`
 
 # Use linker flags to provide version/build settings to the target
-LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD)"
+LDFLAGS=-ldflags "-X=main.version=$(VERSION) -X=main.commit=$(BUILD) -X=main.date=$(shell date +%FT%T%z)"
 
 # go source files, ignore vendor directory
 SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")

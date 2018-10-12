@@ -16,12 +16,12 @@ package main
 
 import "github.com/coinpaprika/telegram-bot/cmd"
 
-// Version of the program
-var Version = "unknown"
-
-// Build from git revision
-var Build = "unknown"
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
 
 func main() {
-	cmd.Execute(Version, Build)
+	cmd.Execute(version, commit, date)
 }

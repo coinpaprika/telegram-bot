@@ -22,8 +22,9 @@ import (
 )
 
 var (
-	version = "unknown"
-	build   = "unknown"
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
 )
 
 // versionCmd represents the version command
@@ -31,7 +32,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Shows the application version and git revision",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("\nBuilt : %s \nVersion: %s (with : %s)\n\n", build, version, runtime.Version())
+		fmt.Printf("\nBuilt : %s \nVersion: %s (with : %s) \nDate: %s\n\n", commit, version, runtime.Version(), date)
 	},
 }
 
