@@ -96,20 +96,30 @@ func run() error {
 			text := `Please use one of the commands:
 
 			/start or /help 	show this message
-			/p <symbol> 		check the price for given coin
+			/p <symbol> 		check the coin price
+			/s <symbol> 		check the circulating supply
+			/v <symbol> 		check the 24h volume
 
-			/website	 		show link to the coinpaprika webpage
 			/source 			show source code of this bot
 			`
 			log.Debugf("received command: %s", u.Message.Command())
 			switch u.Message.Command() {
-			case "website":
-				text = "https://coinpaprika.com"
 			case "source":
 				text = "https://github.com/coinpaprika/telegram-bot"
 			case "p":
-				if text, err = commandP(u.Message.CommandArguments()); err != nil {
-					text = err.Error()
+				if text, err = commandPrice(u.Message.CommandArguments()); err != nil {
+					text = "invalid coin name|ticker|symbol, please try again"
+					log.Error(err)
+				}
+			case "s":
+				if text, err = commandSupply(u.Message.CommandArguments()); err != nil {
+					text = "invalid coin name|ticker|symbol, please try again"
+					log.Error(err)
+				}
+			case "v":
+				if text, err = commandVolume(u.Message.CommandArguments()); err != nil {
+					text = "invalid coin name|ticker|symbol, please try again"
+					log.Error(err)
 				}
 			}
 
@@ -131,31 +141,60 @@ func run() error {
 	return http.ListenAndServe(fmt.Sprintf(":%d", metrics), http.DefaultServeMux)
 }
 
-func commandP(argument string) (string, error) {
-	log.Debugf("starting command /p with argument :%s", argument)
+func commandPrice(argument string) (string, error) {
+	log.Debugf("processing command /p with argument :%s", argument)
 
+	ticker, err := getTickerByQuery(argument)
+	if err != nil {
+		return "", errors.Wrap(err, "command /p")
+	}
+
+	return fmt.Sprintf("%s price: %f USD, %f BTC \n\n http://coinpaprika.com/coin/%s", ticker.Name, *ticker.PriceUSD, *ticker.PriceBTC, ticker.ID), nil
+}
+
+func commandSupply(argument string) (string, error) {
+	log.Debugf("processing command /s with argument :%s", argument)
+
+	ticker, err := getTickerByQuery(argument)
+	if err != nil {
+		return "", errors.Wrap(err, "command /s")
+	}
+
+	return fmt.Sprintf("%s circulating supply: %d \n\n http://coinpaprika.com/coin/%s", ticker.Name, *ticker.CirculatingSupply, ticker.ID), nil
+}
+
+func commandVolume(argument string) (string, error) {
+	log.Debugf("processing command /v with argument :%s", argument)
+
+	ticker, err := getTickerByQuery(argument)
+	if err != nil {
+		return "", errors.Wrap(err, "command /v")
+	}
+
+	return fmt.Sprintf("%s 24h volume: %d USD \n\n http://coinpaprika.com/coin/%s", ticker.Name, *ticker.Volume24hUSD, ticker.ID), nil
+}
+
+func getTickerByQuery(query string) (*coinpaprika.CoinTicker, error) {
 	paprikaClient, err := coinpaprika.NewClient()
 	if err != nil {
-		return "", errors.Wrap(err, "command /p argument:"+argument)
+		return nil, errors.Wrap(err, "query:"+query)
 	}
 
-	result, err := paprikaClient.Search(argument, &coinpaprika.SearchOptions{Categories: "currencies"})
+	result, err := paprikaClient.Search(query, &coinpaprika.SearchOptions{Categories: "currencies"})
 	if err != nil {
-		return "", errors.Wrap(err, "command /p argument:"+argument)
+		return nil, errors.Wrap(err, "query:"+query)
 	}
 
-	log.Debugf("found %d results for command /p with argument :%s", len(result.Currencies), argument)
+	log.Debugf("found %d results for query :%s", len(result.Currencies), query)
 	if len(result.Currencies) <= 0 {
-		return "", errors.Errorf("%s is invalid coin name|ticker|symbol", argument)
+		return nil, errors.Errorf("invalid coin name|ticker|symbol")
 	}
+	log.Debugf("best match for query :%s is: %s", query, result.Currencies[0].ID)
 
-	tickerID := result.Currencies[0].ID
-	log.Debugf("best match for command /p with argument :%s is: %s", argument, tickerID)
-
-	ticker, err := paprikaClient.GetTickerByID(tickerID)
+	ticker, err := paprikaClient.GetTickerByID(result.Currencies[0].ID)
 	if err != nil {
-		return "", errors.Wrap(err, "command /p argument:"+argument)
+		return nil, errors.Wrap(err, "query:"+query)
 	}
 
-	return fmt.Sprintf("%s price: %f USD, %f BTC", ticker.Name, *ticker.PriceUSD, *ticker.PriceBTC), nil
+	return ticker, nil
 }
