@@ -34,7 +34,7 @@ simplify:
 	@gofmt -s -l -w $(SRC)
 
 check:
-    @go get -u golang.org/x/lint/golint
+	@go get -u golang.org/x/lint/golint
 	@test -z $(shell gofmt -l main.go | tee /dev/stderr) || echo "[WARN] Fix formatting issues with 'make fmt'"
 	@for d in $$(go list ./... | grep -v /vendor/); do golint $${d}; done
 	@go tool vet ${SRC}
