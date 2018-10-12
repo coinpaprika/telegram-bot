@@ -4,4 +4,4 @@ go:
   - "1.10"
 script:
   - make check
-  - go test -v -race ./...
+  - make test

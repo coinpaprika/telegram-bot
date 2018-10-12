@@ -14,7 +14,7 @@ LDFLAGS=-ldflags "-X=main.version=$(VERSION) -X=main.commit=$(BUILD) -X=main.dat
 # go source files, ignore vendor directory
 SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
-.PHONY: all build clean install uninstall fmt simplify check run
+.PHONY: all build clean install uninstall fmt simplify check run test
 
 all: check build
 
@@ -33,6 +33,8 @@ fmt:
 simplify:
 	@gofmt -s -l -w $(SRC)
 
+test:
+	@go test -v -race ./...
 check:
 	@go get -u golang.org/x/lint/golint
 	@test -z $(shell gofmt -l main.go | tee /dev/stderr) || echo "[WARN] Fix formatting issues with 'make fmt'"
