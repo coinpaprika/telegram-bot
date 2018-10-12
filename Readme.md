@@ -1,5 +1,8 @@
 # Coinpaprika telegram bot
 
+## Telegram address 
+t.me/CoinpaprikaBot
+
 ## Building project
 
 ```
