@@ -1,10 +1,23 @@
 # Coinpaprika telegram bot
 
-Current status: work in progress
+## Building project
 
-TODO
-- [ ] Implement core functionality
-- [ ] Add metrics number of proccesed messages, in queue (prometheus endpoint)
-- [ ] Add tests
-- [ ] Remove expvar or at least cmdline (it contains token)
-- [ ] Integrate configuration options via config file, ENV, flags (evaluate viper)
+```
+git clone git@github.com:coinpaprika/telegram-bot.git
+cd telegram-bot/
+make 
+```
+
+## Running bot
+Basic usage: ```./telegram-bot run -t "telegram_bot_api_key"```
+
+Where telegram_bot_api_key can be generated as described https://core.telegram.org/bots#creating-a-new-bot 
+
+
+Additional parameters are described in help section:
+```./telegram-bot run --help```
+
+By default [/metrics](http://localhost:9900/metrics) endopoint is launched which is compatibile with https://prometheus.io/
+
+## Version checking
+```./telegram-bot version```
