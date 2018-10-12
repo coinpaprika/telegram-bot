@@ -32,7 +32,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Shows the application version and git revision",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("\nBuilt : %s \nVersion: %s (with : %s) \nDate: %s\n\n", commit, version, runtime.Version(), date)
+		fmt.Printf("\nBuilt : %s \nVersion: %s (built with: %s) \nDate: %s\n\n", commit, version, runtime.Version(), date)
 	},
 }
 
