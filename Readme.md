@@ -1,6 +1,8 @@
-[![Build Status](https://travis-ci.org/coinpaprika/telegram-bot.svg?branch=master)](https://travis-ci.org/coinpaprika/telegram-bot)
-[![go-doc](https://godoc.org/github.com/coinpaprika/telegram-bot?status.svg)](https://godoc.org/github.com/coinpaprika/telegram-bot)
-[![Go Report Card](https://goreportcard.com/badge/github.com/coinpaprika/telegram-bot)](https://goreportcard.com/report/github.com/coinpaprika/telegram-bot)
+[![Release](https://img.shields.io/github/release/coinpaprika/telegram-bot.svg?branch=master)](https://github.com/coinpaprika/telegram-bot/releases) 
+[![Build Status](https://travis-ci.org/coinpaprika/telegram-bot.svg?branch=master)](https://travis-ci.org/coinpaprika/telegram-bot) 
+[![go-doc](https://godoc.org/github.com/coinpaprika/telegram-bot?status.svg)](https://godoc.org/github.com/coinpaprika/telegram-bot) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/coinpaprika/telegram-bot)](https://goreportcard.com/report/github.com/coinpaprika/telegram-bot) 
+[![Followers](https://img.shields.io/twitter/follow/coinpaprika.svg?style=social&label=Follow)](https://twitter.com/coinpaprika)
 
 # Coinpaprika telegram bot
 
