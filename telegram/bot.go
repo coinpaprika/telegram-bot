@@ -33,6 +33,7 @@ func (b *Bot) GetUpdatesChannel() (tgbotapi.UpdatesChannel, error) {
 func (b *Bot) SendMessage(m Message) error {
 	msg := tgbotapi.NewMessage(int64(m.ChatID), m.Text)
 	msg.ReplyToMessageID = m.MessageID
+	msg.DisableWebPagePreview = true
 	_, err := b.Bot.Send(msg)
 	return errors.Wrapf(err, "could not send message: %v", m)
 }
