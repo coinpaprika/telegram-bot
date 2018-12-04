@@ -79,6 +79,38 @@ func (suite *RunTestSuite) TestCommandSupply() {
 	}
 }
 
+func (suite *RunTestSuite) TestCommandVolume() {
+	tests := map[string]struct {
+		error bool
+	}{
+		"btc": {
+			error: false,
+		},
+		"Bitcoin": {
+			error: false,
+		},
+		"Invalid_coin": {
+			error: true,
+		},
+	}
+
+	for s, r := range tests {
+		response, err := commandVolume(s)
+
+		if !r.error {
+			suite.NoError(err)
+
+			volumeRe := regexp.MustCompile(`[0-9]*[.][0-9]+`)
+			volumeStrings := volumeRe.FindStringSubmatch(response)
+			suite.NotEmpty(volumeStrings)
+
+			volumeFloat, err := strconv.ParseFloat(volumeStrings[0], 64)
+			suite.NoError(err)
+			suite.True(volumeFloat > 100, "should be more than 100")
+		}
+	}
+}
+
 func TestRunTestSuite(t *testing.T) {
 	suite.Run(t, new(RunTestSuite))
 }
