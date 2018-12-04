@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/coinpaprika/coinpaprika-api-go-client"
+	"github.com/coinpaprika/coinpaprika-api-go-client/coinpaprika"
 	"github.com/coinpaprika/telegram-bot/telegram"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
@@ -148,7 +148,13 @@ func commandPrice(argument string) (string, error) {
 		return "", errors.Wrap(err, "command /p")
 	}
 
-	return fmt.Sprintf("%s price: %f USD, %f BTC \n\n http://coinpaprika.com/coin/%s", ticker.Name, *ticker.PriceUSD, *ticker.PriceBTC, ticker.ID), nil
+	priceUSD := ticker.Quotes["USD"].Price
+	priceBTC := ticker.Quotes["BTC"].Price
+	if ticker.Name == nil || ticker.ID == nil || priceUSD == nil || priceBTC == nil {
+		return "", errors.Wrap(errors.New("missing data"), "command /p")
+	}
+
+	return fmt.Sprintf("%s price: %f USD, %f BTC \n\n http://coinpaprika.com/coin/%s", *ticker.Name, *priceUSD, *priceBTC, *ticker.ID), nil
 }
 
 func commandSupply(argument string) (string, error) {
@@ -159,7 +165,11 @@ func commandSupply(argument string) (string, error) {
 		return "", errors.Wrap(err, "command /s")
 	}
 
-	return fmt.Sprintf("%s circulating supply: %d \n\n http://coinpaprika.com/coin/%s", ticker.Name, *ticker.CirculatingSupply, ticker.ID), nil
+	if ticker.Name == nil || ticker.ID == nil || ticker.CirculatingSupply == nil {
+		return "", errors.Wrap(errors.New("missing data"), "command /s")
+	}
+
+	return fmt.Sprintf("%s circulating supply: %d \n\n http://coinpaprika.com/coin/%s", *ticker.Name, *ticker.CirculatingSupply, *ticker.ID), nil
 }
 
 func commandVolume(argument string) (string, error) {
@@ -170,16 +180,19 @@ func commandVolume(argument string) (string, error) {
 		return "", errors.Wrap(err, "command /v")
 	}
 
-	return fmt.Sprintf("%s 24h volume: %d USD \n\n http://coinpaprika.com/coin/%s", ticker.Name, *ticker.Volume24hUSD, ticker.ID), nil
-}
-
-func getTickerByQuery(query string) (*coinpaprika.CoinTicker, error) {
-	paprikaClient, err := coinpaprika.NewClient()
-	if err != nil {
-		return nil, errors.Wrap(err, "query:"+query)
+	volumeUSD := ticker.Quotes["USD"].Volume24h
+	if ticker.Name == nil || ticker.ID == nil || volumeUSD == nil {
+		return "", errors.Wrap(errors.New("missing data"), "command /v")
 	}
 
-	result, err := paprikaClient.Search(query, &coinpaprika.SearchOptions{Categories: "currencies"})
+	return fmt.Sprintf("%s 24h volume: %.2f USD \n\n http://coinpaprika.com/coin/%s", *ticker.Name, *volumeUSD, *ticker.ID), nil
+}
+
+func getTickerByQuery(query string) (*coinpaprika.Ticker, error) {
+	paprikaClient := coinpaprika.NewClient(nil)
+
+	searchOpts := &coinpaprika.SearchOptions{Query: query, Categories: "currencies"}
+	result, err := paprikaClient.Search.Search(searchOpts)
 	if err != nil {
 		return nil, errors.Wrap(err, "query:"+query)
 	}
@@ -188,9 +201,14 @@ func getTickerByQuery(query string) (*coinpaprika.CoinTicker, error) {
 	if len(result.Currencies) <= 0 {
 		return nil, errors.Errorf("invalid coin name|ticker|symbol")
 	}
-	log.Debugf("best match for query :%s is: %s", query, result.Currencies[0].ID)
+	if result.Currencies[0].ID == nil {
+		return nil, errors.New("missing id for a coin")
+	}
 
-	ticker, err := paprikaClient.GetTickerByID(result.Currencies[0].ID)
+	log.Debugf("best match for query :%s is: %s", query, *result.Currencies[0].ID)
+
+	tickerOpts := &coinpaprika.TickersOptions{Quotes: "USD,BTC"}
+	ticker, err := paprikaClient.Tickers.GetByID(*result.Currencies[0].ID, tickerOpts)
 	if err != nil {
 		return nil, errors.Wrap(err, "query:"+query)
 	}
