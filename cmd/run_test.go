@@ -25,8 +25,8 @@ func (suite *RunTestSuite) TestCommandPrice() {
 			error:    false,
 		},
 		"Bitcoin": {
-			contains: "Bitcoin",
-			error:    false,
+			contains: "",
+			error:    true,
 		},
 		"Invalid_coin": {
 			contains: "",
@@ -55,7 +55,7 @@ func (suite *RunTestSuite) TestCommandSupply() {
 			error: false,
 		},
 		"Bitcoin": {
-			error: false,
+			error: true,
 		},
 		"Invalid_coin": {
 			error: true,
@@ -87,7 +87,7 @@ func (suite *RunTestSuite) TestCommandVolume() {
 			error: false,
 		},
 		"Bitcoin": {
-			error: false,
+			error: true,
 		},
 		"Invalid_coin": {
 			error: true,
