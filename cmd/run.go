@@ -191,7 +191,7 @@ func commandVolume(argument string) (string, error) {
 func getTickerByQuery(query string) (*coinpaprika.Ticker, error) {
 	paprikaClient := coinpaprika.NewClient(nil)
 
-	searchOpts := &coinpaprika.SearchOptions{Query: query, Categories: "currencies"}
+	searchOpts := &coinpaprika.SearchOptions{Query: query, Categories: "currencies", Modifier: "symbol_search"}
 	result, err := paprikaClient.Search.Search(searchOpts)
 	if err != nil {
 		return nil, errors.Wrap(err, "query:"+query)
