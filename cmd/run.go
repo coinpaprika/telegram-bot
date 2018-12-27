@@ -191,15 +191,25 @@ func commandVolume(argument string) (string, error) {
 func getTickerByQuery(query string) (*coinpaprika.Ticker, error) {
 	paprikaClient := coinpaprika.NewClient(nil)
 
-	searchOpts := &coinpaprika.SearchOptions{Query: query, Categories: "currencies"}
+	searchOpts := &coinpaprika.SearchOptions{Query: query, Categories: "currencies", Modifier: "symbol_search"}
 	result, err := paprikaClient.Search.Search(searchOpts)
 	if err != nil {
 		return nil, errors.Wrap(err, "query:"+query)
 	}
 
-	log.Debugf("found %d results for query :%s", len(result.Currencies), query)
+	log.Debugf("found %d results for query by symbol :%s", len(result.Currencies), query)
 	if len(result.Currencies) <= 0 {
-		return nil, errors.Errorf("invalid coin name|ticker|symbol")
+		//search by name:
+		searchOpts = &coinpaprika.SearchOptions{Query: query, Categories: "currencies"}
+		result, err = paprikaClient.Search.Search(searchOpts)
+		if err != nil {
+			return nil, errors.Wrap(err, "query:"+query)
+		}
+		log.Debugf("found %d results for query by name :%s", len(result.Currencies), query)
+
+		if len(result.Currencies) <= 0 {
+			return nil, errors.Errorf("invalid coin name|ticker|symbol")
+		}
 	}
 	if result.Currencies[0].ID == nil {
 		return nil, errors.New("missing id for a coin")

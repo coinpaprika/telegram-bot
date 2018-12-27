@@ -28,6 +28,8 @@ type SearchOptions struct {
 
 	// The number of results per category.
 	Limit int `url:"limit,omitempty"`
+
+	Modifier string `url:"modifier,omitempty"`
 }
 
 // Search returns a list of currencies, exchanges, icos, people and tags for given query.
@@ -43,9 +45,6 @@ func (s *SearchService) Search(options *SearchOptions) (searchResult *SearchResu
 		return nil, err
 	}
 
-	if err := json.Unmarshal(body, &searchResult); err != nil {
-		return searchResult, err
-	}
-
-	return searchResult, nil
+	err = json.Unmarshal(body, &searchResult)
+	return searchResult, err
 }

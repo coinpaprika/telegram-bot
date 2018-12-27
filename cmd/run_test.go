@@ -39,6 +39,8 @@ func (suite *RunTestSuite) TestCommandPrice() {
 
 		if !r.error {
 			suite.NoError(err)
+		} else {
+			suite.Error(err)
 		}
 
 		if r.contains != "" {
@@ -75,6 +77,8 @@ func (suite *RunTestSuite) TestCommandSupply() {
 			supplyInt, err := strconv.Atoi(supplyStrings[0])
 			suite.NoError(err)
 			suite.True(supplyInt > 100, "should be more than 100")
+		} else {
+			suite.Error(err)
 		}
 	}
 }
@@ -107,6 +111,8 @@ func (suite *RunTestSuite) TestCommandVolume() {
 			volumeFloat, err := strconv.ParseFloat(volumeStrings[0], 64)
 			suite.NoError(err)
 			suite.True(volumeFloat > 100, "should be more than 100")
+		} else {
+			suite.Error(err)
 		}
 	}
 }
