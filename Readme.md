@@ -4,6 +4,10 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/coinpaprika/telegram-bot)](https://goreportcard.com/report/github.com/coinpaprika/telegram-bot) 
 [![Followers](https://img.shields.io/twitter/follow/coinpaprika.svg?style=social&label=Follow)](https://twitter.com/coinpaprika)
 
+# Archived
+This repository is not maintained, please visit the new one: [https://github.com/coinpaprika/telegram-bot-v2](https://github.com/coinpaprika/telegram-bot-v2)
+
+
 # Coinpaprika telegram bot
 
 ## Commands
